@@ -1,9 +1,9 @@
-import { Button } from "./components/ui/button";
+import { ToggleTheme } from "./components/theme/toggle-theme";
 
 export function App() {
   return (
     <div>
-      <Button className="p-4 bg-sky-400"> xesque </Button>
+      <ToggleTheme />
     </div>
   );
 }
