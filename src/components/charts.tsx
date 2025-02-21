@@ -20,61 +20,111 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-const chartData = [
-  {"Data":"2024-11-01 00:00:00","Mensagem":448},
-  {"Data":"2024-11-01 01:00:00","Mensagem":2222},
-  {"Data":"2024-11-01 02:00:00","Mensagem":3248},
-  {"Data":"2024-11-01 03:00:00","Mensagem":2458},
-  {"Data":"2024-11-01 04:00:00","Mensagem":1308},
-  {"Data":"2024-11-01 05:00:00","Mensagem":827},
-  {"Data":"2024-11-01 06:00:00","Mensagem":0},
-  {"Data":"2024-11-01 07:00:00","Mensagem":1251},
-  {"Data":"2024-11-01 08:00:00","Mensagem":1655},
-  {"Data":"2024-11-01 09:00:00","Mensagem":2109},
-  {"Data":"2024-11-01 10:00:00","Mensagem":1415},
-  {"Data":"2024-11-01 11:00:00","Mensagem":1161},
-  {"Data":"2024-11-01 12:00:00","Mensagem":500},
-  {"Data":"2024-11-01 13:00:00","Mensagem":1200},
-  {"Data":"2024-11-01 14:00:00","Mensagem":1344},
-  {"Data":"2024-11-01 15:00:00","Mensagem":1315},
-  {"Data":"2024-11-01 16:00:00","Mensagem":1438},
-  {"Data":"2024-11-01 17:00:00","Mensagem":577},
-  {"Data":"2024-11-01 18:00:00","Mensagem":831},
-  {"Data":"2024-11-01 19:00:00","Mensagem":2215},
-  {"Data":"2024-11-01 20:00:00","Mensagem":1727},
-  {"Data":"2024-11-01 21:00:00","Mensagem":2355},
-  {"Data":"2024-11-01 22:00:00","Mensagem":2331},
-  {"Data":"2024-11-01 23:00:00","Mensagem":1105},
-]
+import { useEffect, useState } from "react";
+import { api } from "@/lib/axios/axios";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "./ui/button";
+import { SetChart } from "./SetChart";
 
-
+import { z } from "zod";
+import { Form, useForm } from "react-hook-form";
+import { Checkbox } from "./ui/checkbox";
+import { FormControl, FormField, FormItem } from "./ui/form";
 
 const chartConfig = {
-  desktop: {
-    label: "Mobile",
+  ind: {
+    label: "qtdInd",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+  rec: {
+    label: "qtdRec",
+    color: "hsl(var(--chart-2))",
   },
-} satisfies ChartConfig
+  rej: {
+    label: "qtdRej",
+    color: "hsl(var(--chart-3))",
+  },
+} satisfies ChartConfig;
+
+interface Req {
+  date: string;
+  qtdInd: number;
+  qtdRec: number;
+  qtdRej: number;
+}
 
 export function Charts() {
+  const [chart, setChart] = useState<Req[]>([]);
+  const [viewChart, setViewChart] = useState(["qtdInd"]);
+  const input = "2024-11-02 03:00:00";
+  const encodedInput = encodeURIComponent(input);
+  async function fetchRequestInd() {
+    const response = await api.get(
+      `/ind?date_gte=${encodedInput}&date_lte=2024-11-02%2018:00:00`,
+    );
+
+    setChart(response.data);
+  }
+
+  useEffect(() => {
+    fetchRequestInd();
+  }, []);
+
+  const handleCheckboxChange = (value:string, checked:boolean) => {
+    setViewChart((state) =>{
+      if(checked){
+        return[...state,value]
+      }else{
+        return state.filter(item => item !== value);
+      }
+    })
+  } 
+
+  const form = useForm();
+
   return (
-    <Card >
-      <CardHeader>
-        <CardTitle>Volumetria Sorter</CardTitle>
-        <CardDescription>
-          Quantidades de caixas induzidas, rejeitadas e recirculadas
-        </CardDescription>
+    <Card>
+      <CardHeader className="m-2 flex flex-row justify-between">
+        <div className="flex flex-col gap-2">
+          <CardTitle>Volumetria Sorter</CardTitle>
+          <CardDescription>
+            Quantidades de caixas induzidas, rejeitadas e recirculadas
+          </CardDescription>
+        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button className="w-[220px]" variant="outline">
+              Filtro
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[220px]">
+            <Form {...form}>
+              <form className="flex flex-col gap-2">
+                <FormItem>
+                    <div className="flex items-center justify-start gap-3">
+                      <Checkbox id="ind" checked={viewChart.includes('qtdInd')} onCheckedChange={(checked => handleCheckboxChange('qtdInd',checked))} />
+                      <label htmlFor="ind">Indução</label>
+                    </div>{" "}
+                    <div className="flex items-center justify-start gap-3">
+                      <Checkbox id="rec" checked={viewChart.includes('qtdRec')} onCheckedChange={(checked => handleCheckboxChange('qtdRec',checked))} />
+                      <label htmlFor="rec">Recirculação</label>
+                    </div>{" "}
+                    <div className="flex items-center justify-start gap-3">
+                      <Checkbox id="rej" checked={viewChart.includes('qtdRej')} onCheckedChange={(checked => handleCheckboxChange('qtdRej',checked))} />
+                      <label htmlFor="rej">Rejeito</label>{" "}
+                    </div>
+                </FormItem>
+              </form>
+            </Form>
+          </PopoverContent>
+        </Popover>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={360}>
           <ChartContainer config={chartConfig}>
             <AreaChart
               accessibilityLayer
-              data={chartData}
+              data={chart}
               margin={{
                 left: 12,
                 right: 12,
@@ -82,34 +132,41 @@ export function Charts() {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="Data"
+                dataKey="date"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tickFormatter={(value) => value.slice(10,16)}
+                tickFormatter={(value) => value.slice(11, 16)}
               />
-              <YAxis                 tickLine={false}
-                axisLine={false}/>
+              <YAxis tickLine={false} axisLine={false} />
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent indicator="dot" />}
               />
               <Area
-                dataKey="Mensagem"
-                type="natural"
-                fill="var(--color-mobile)"
+                dataKey={viewChart[0]}
+                fill="var(--color-ind)"
                 fillOpacity={0.4}
-                stroke="var(--color-mobile)"
+                stroke="var(--color-ind)"
+                type="monotone"
                 stackId="a"
               />
-              {/* <Area
-                dataKey="rec"
-                type="natural"
-                fill="var(--color-desktop)"
+              <Area
+                dataKey={viewChart[1]}
+                type="monotone"
+                fill="var(--color-rej)"
                 fillOpacity={0.4}
-                stroke="var(--color-desktop)"
-                stackId="a"
-              /> */}
+                stroke="var(--color-rej)"
+                stackId="b"
+              />{" "}
+              <Area
+                dataKey={viewChart[2]}
+                type="monotone"
+                fill="var(--color-rec)"
+                fillOpacity={0.4}
+                stroke="var(--color-rec)"
+                stackId="c"
+              />
             </AreaChart>
           </ChartContainer>
         </ResponsiveContainer>
