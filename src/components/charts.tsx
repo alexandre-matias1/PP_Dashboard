@@ -24,12 +24,9 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/axios/axios";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
-import { SetChart } from "./SetChart";
 
-import { z } from "zod";
-import { Form, useForm } from "react-hook-form";
 import { Checkbox } from "./ui/checkbox";
-import { FormControl, FormField, FormItem } from "./ui/form";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 const chartConfig = {
   ind: {
@@ -70,17 +67,15 @@ export function Charts() {
     fetchRequestInd();
   }, []);
 
-  const handleCheckboxChange = (value:string, checked:boolean) => {
-    setViewChart((state) =>{
-      if(checked){
-        return[...state,value]
-      }else{
-        return state.filter(item => item !== value);
+  const handleCheckboxChange = (value: string, checked: CheckedState) => {
+    setViewChart((state) => {
+      if (checked) {
+        return [...state, value];
+      } else {
+        return state.filter((item) => item !== value);
       }
-    })
-  } 
-
-  const form = useForm();
+    });
+  };
 
   return (
     <Card>
@@ -94,28 +89,40 @@ export function Charts() {
         <Popover>
           <PopoverTrigger asChild>
             <Button className="w-[220px]" variant="outline">
-              Filtro
+              Teste
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[220px]">
-            <Form {...form}>
-              <form className="flex flex-col gap-2">
-                <FormItem>
-                    <div className="flex items-center justify-start gap-3">
-                      <Checkbox id="ind" checked={viewChart.includes('qtdInd')} onCheckedChange={(checked => handleCheckboxChange('qtdInd',checked))} />
-                      <label htmlFor="ind">Indução</label>
-                    </div>{" "}
-                    <div className="flex items-center justify-start gap-3">
-                      <Checkbox id="rec" checked={viewChart.includes('qtdRec')} onCheckedChange={(checked => handleCheckboxChange('qtdRec',checked))} />
-                      <label htmlFor="rec">Recirculação</label>
-                    </div>{" "}
-                    <div className="flex items-center justify-start gap-3">
-                      <Checkbox id="rej" checked={viewChart.includes('qtdRej')} onCheckedChange={(checked => handleCheckboxChange('qtdRej',checked))} />
-                      <label htmlFor="rej">Rejeito</label>{" "}
-                    </div>
-                </FormItem>
-              </form>
-            </Form>
+            <div className="flex items-center justify-start gap-3">
+              <Checkbox
+                id="ind"
+                checked={viewChart.includes("qtdInd")}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("qtdInd", checked)
+                }
+              />
+              <label htmlFor="ind">Indução</label>
+            </div>{" "}
+            <div className="flex items-center justify-start gap-3">
+              <Checkbox
+                id="rec"
+                checked={viewChart.includes("qtdRec")}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("qtdRec", checked)
+                }
+              />
+              <label htmlFor="rec">Recirculação</label>
+            </div>{" "}
+            <div className="flex items-center justify-start gap-3">
+              <Checkbox
+                id="rej"
+                checked={viewChart.includes("qtdRej")}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("qtdRej", checked)
+                }
+              />
+              <label htmlFor="rej">Rejeito</label>{" "}
+            </div>
           </PopoverContent>
         </Popover>
       </CardHeader>
