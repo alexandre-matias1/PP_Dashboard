@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios/axios";
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useState } from "react";
 
 interface Req {
   date: string;
@@ -22,6 +22,7 @@ interface ChartsProviderProps {
 
 interface ChartsContextType {
   chart: Req[];
+  fetchRequestInd: (start?: string, end?: string) => Promise<void>;
 }
 
 export const ChartsContext = createContext({} as ChartsContextType);
@@ -29,24 +30,24 @@ export const ChartsContext = createContext({} as ChartsContextType);
 export function ChartsProvider({ children }: ChartsProviderProps) {
   const [chart, setChart] = useState<Req[]>([]);
   // const [viewChart, setViewChart] = useState(["qtdInd"]);
-  const input = "2024-11-02 03:00:00";
-  const encodedInput = encodeURIComponent(input);
-  async function fetchRequestInd() {
-    const response = await api.get(
-      `/ind?date_gte=${encodedInput}&date_lte=2024-11-02%2018:00:00`,
-    );
+  async function fetchRequestInd(start: any, end: any) {
 
-    setChart(response.data);
+
+    try {
+      const response = await api.get(
+        `/ind?date_gte=${start}&date_lte=${end}`,
+      );
+      setChart(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar os dados:", error);
+    }
   }
-
-  useEffect(() => {
-    fetchRequestInd();
-  }, []);
 
   return (
     <ChartsContext.Provider
       value={{
         chart,
+        fetchRequestInd,
       }}
     >
       {children}

@@ -20,7 +20,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 
@@ -45,7 +45,7 @@ const chartConfig = {
 
 
 export function Charts() {
-  const {chart} = useContext(ChartsContext)
+  const {chart, fetchRequestInd} = useContext(ChartsContext)
   const [viewChart, setViewChart] = useState(["qtdInd"]);
   // const input = "2024-11-02 03:00:00";
   // const encodedInput = encodeURIComponent(input);
@@ -61,6 +61,10 @@ export function Charts() {
     });
   };
 
+  useEffect(() => {
+    fetchRequestInd();
+  }, []);
+
   return (
     <Card>
       <CardHeader className="m-2 flex flex-row justify-between">
@@ -73,6 +77,7 @@ export function Charts() {
         <Popover>
           <PopoverTrigger asChild>
             <Button className="w-[220px]" variant="outline">
+              Filtrar
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[220px]">
