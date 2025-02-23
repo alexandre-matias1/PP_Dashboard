@@ -20,13 +20,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useEffect, useState } from "react";
-import { api } from "@/lib/axios/axios";
+import { useContext, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 
 import { Checkbox } from "./ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import { ChartsContext } from "@/context/ChartsContext";
 
 const chartConfig = {
   ind: {
@@ -43,29 +43,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-interface Req {
-  date: string;
-  qtdInd: number;
-  qtdRec: number;
-  qtdRej: number;
-}
 
 export function Charts() {
-  const [chart, setChart] = useState<Req[]>([]);
+  const {chart} = useContext(ChartsContext)
   const [viewChart, setViewChart] = useState(["qtdInd"]);
-  const input = "2024-11-02 03:00:00";
-  const encodedInput = encodeURIComponent(input);
-  async function fetchRequestInd() {
-    const response = await api.get(
-      `/ind?date_gte=${encodedInput}&date_lte=2024-11-02%2018:00:00`,
-    );
+  // const input = "2024-11-02 03:00:00";
+  // const encodedInput = encodeURIComponent(input);
 
-    setChart(response.data);
-  }
-
-  useEffect(() => {
-    fetchRequestInd();
-  }, []);
 
   const handleCheckboxChange = (value: string, checked: CheckedState) => {
     setViewChart((state) => {
@@ -89,7 +73,6 @@ export function Charts() {
         <Popover>
           <PopoverTrigger asChild>
             <Button className="w-[220px]" variant="outline">
-              Teste
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[220px]">
