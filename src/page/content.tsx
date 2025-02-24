@@ -1,4 +1,5 @@
 import { Charts } from "@/components/charts";
+import DateTimePickerForm from "@/components/time-picker/date-time-picker-form";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { ChartsContext } from "@/context/ChartsContext";
 import { Package, PackageSearch, PackageX } from "lucide-react";
@@ -31,7 +32,9 @@ export function Content() {
           <div className="flex gap-4">
             <CardContent className="flex w-full justify-between">
               <p className="font-semibold text-pink-600">{totalRec}</p>
-              <p className="font-semibold text-amber-300">{((totalRec/totalInd)*100).toFixed(2)}</p>
+              <p className="font-semibold text-amber-300">
+                {((totalRec / totalInd) * 100).toFixed(2)}
+              </p>
             </CardContent>{" "}
           </div>
         </Card>{" "}
@@ -43,11 +46,14 @@ export function Content() {
           <div className="flex gap-4">
             <CardContent className="flex w-full justify-between">
               <p className="font-semibold text-pink-600">{totalRej}</p>
-              <p className="font-semibold text-amber-300">{((totalRej/totalInd)*100).toFixed(2)}</p>
+              <p className="font-semibold text-amber-300">
+                {((totalRej / totalInd) * 100).toFixed(2)}
+              </p>
             </CardContent>{" "}
           </div>
         </Card>
       </div>
+      <DateTimePickerForm />
       <div className="w-[1280px]">
         <Charts />
       </div>
